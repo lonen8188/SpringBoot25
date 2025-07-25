@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor // final을 붙인 필드로 생성자 만듬.
 public class BoardController {
 
-    @Value("${org.mbc.upload.path")
+    @Value("${org.mbc.upload.path}")
     private String uploadPath;
     private final BoardService boardService;
 
