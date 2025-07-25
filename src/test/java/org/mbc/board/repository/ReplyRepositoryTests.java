@@ -23,7 +23,7 @@ public class ReplyRepositoryTests {
     @Test
     public void testInsert(){
         // 댓글 등록용 테스트
-        Long bno = 100L; // db에 있는지 확인필요
+        Long bno = 104L; // db에 있는지 확인필요
 
         // 100번 게시물에 댓글을 넣어보자.
         Board board = Board.builder().bno(bno).build();

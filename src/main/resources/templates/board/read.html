@@ -57,10 +57,19 @@
                         </div>
                     </div>
                 </div><!--end card body-->
-            </div><!--end card-->
-        </div><!-- end col-->
-    </div><!-- end row-->
+                <!--  664 첨부 이미지 보이게 설정 -->
+                <div class="col">
+                    <div class="card" th:if="${dto.fileNames != null && dto.fileNames.size() > 0}">
+                        <img class="card-img-top"
+                             th:each="fileName: ${dto.fileNames}"
+                             th:src="|/view/${fileName}|">
 
+
+                    </div> <!-- col end -->
+                </div><!--end card-->
+            </div><!-- end col-->
+        </div><!-- end row-->
+    </div>
 
     <!-- 댓글 추가 버튼 570   -->
     <div class="row mt-3">

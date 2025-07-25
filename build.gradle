@@ -34,6 +34,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' /* 프론트 관련 */
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0' /* 프론트 레이아웃 관련*/
+    // https://mvnrepository.com/artifact/net.coobird/thumbnailator
+    implementation("net.coobird:thumbnailator:0.4.16")                      /* 파일 섬네일 처리용 p603 */
 
     implementation 'org.springframework.boot:spring-boot-starter-web'       /* string-web */
     compileOnly 'org.projectlombok:lombok'                                  /* 롬북 */

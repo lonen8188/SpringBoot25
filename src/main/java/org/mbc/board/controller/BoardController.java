@@ -1,13 +1,10 @@
 package org.mbc.board.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.log4j.Log4j2;
-import org.mbc.board.dto.BoardDTO;
-import org.mbc.board.dto.BoardListReplyCountDTO;
-import org.mbc.board.dto.PageRequestDTO;
-import org.mbc.board.dto.PageResponseDTO;
-import org.mbc.board.service.BoardService;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.mbc.board.dto.*;
+import org.mbc.board.service.BoardService;
+
+import jakarta.validation.Valid;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.List;
 
 @Controller
 @RequestMapping("/board")  // http://192.168.111.105:80/board
@@ -22,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor // final을 붙인 필드로 생성자 만듬.
 public class BoardController {
 
+    @Value("${org.mbc.upload.path")
+    private String uploadPath;
     private final BoardService boardService;
 
     @GetMapping("/list")
@@ -31,8 +38,8 @@ public class BoardController {
         // p548쪽 제외PageResponseDTO<BoardDTO> responseDTO = boardService.list(pageRequestDTO);
         // 페이징 처리가 되는 요청을 처리하고 결과를 response로 받는다.
 
-        PageResponseDTO<BoardListReplyCountDTO> responseDTO =
-                boardService.listWithReplyCount(pageRequestDTO);
+        PageResponseDTO<BoardListAllDTO> responseDTO =
+                boardService.listWithAll(pageRequestDTO); // p662 수정
         // 댓글의 갯수용 dto로 프론트 전달!!
 
         log.info(responseDTO);
@@ -123,16 +130,45 @@ public class BoardController {
 
 
     @PostMapping("/remove")
-    public String remove(Long bno, RedirectAttributes redirectAttributes) {
+    public String remove(BoardDTO boardDTO, RedirectAttributes redirectAttributes) {
 
-        log.info("remove post.. " + bno);
+        Long bno = boardDTO.getBno();
 
         boardService.remove(bno);
 
+        List<String> fileNames = boardDTO.getFileNames();
+        if(fileNames != null && fileNames.size() > 0) {
+            removeFiles(fileNames);
+        }
         redirectAttributes.addFlashAttribute("result", "removed");
 
         return "redirect:/board/list";
 
+    }
+
+    private void removeFiles(List<String> files) {
+
+        for (String fileName:files) {
+            // import org.springframework.core.io.Resource
+            Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
+            String resourceName = resource.getFilename();
+
+
+            try {
+                String contentType = Files.probeContentType(resource.getFile().toPath());
+                resource.getFile().delete();
+
+                //섬네일이 존재한다면
+                if (contentType.startsWith("image")) {
+                    File thumbnailFile = new File(uploadPath + File.separator + "s_" + fileName);
+                    thumbnailFile.delete();
+                }
+
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+
+        }//end for
     }
 
 }
